@@ -1,58 +1,38 @@
 /**
  * # News Page
  */
-"use client";
 
 /**
  * ## Imports
  */
-import { useState, useEffect } from 'react';
 import NewsList from '@/components/NewsList/NewsList';
+import { getAllNews } from '@/lib/news';
 
 /**
  * ## Component
  */
-export default function NewsPage() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
-    const [news, setNews] = useState();
+export default async function NewsPage() {
+    /* Sending the request from within the component function.
+     * `fetch()` is available even though this being a server component, because:
+     * a) it's supported by Node.js which executes executes this server side code anyways.
+     * b) Next.js extends this `fetch()` and adds some extra caching related features to it.
+     */
+    // const response = await fetch('http://localhost:8080/news');
 
-    useEffect(() => {
-        async function fetchNews() {
-            setIsLoading(true);
-            const response = await fetch('http://localhost:8080/news');
+    // if (!response.ok) {
+    //     throw new Error('Failed to fetch news');
+    // }
 
-            if (!response.ok) {
-                setError('Failed to fetch news.');
-                setIsLoading(false);
-            }
+    // const news = await response.json();
 
-            const news = await response.json();
-            setIsLoading(false);
-            setNews(news);
-        }
-
-        fetchNews();
-    }, []);
-
-    if (isLoading) {
-        return <p>Loading...</p>;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
-    }
-
-    let newsContent;
-
-    if (news) {
-        newsContent = <NewsList news={news} />
-    }
+    /* The above code is just an example. Since the data base lives within this application,
+     * we can also directly reach out to it. */
+    const news = await getAllNews();
 
     return (
         <article>
             <h1>News page</h1>
-            {newsContent}
+            <NewsList news={news} />
         </article>
     );
 };
